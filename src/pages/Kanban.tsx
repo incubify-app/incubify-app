@@ -1,8 +1,15 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { kanbanSteps, KanbanStep, EmpresaIncubada } from '@/constants/mocks';
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import {
+	kanbanSteps,
+	KanbanStep,
+	EmpresaIncubada,
+	empresasIncubadas,
+	incubadoras,
+	Incubadora,
+} from '@/constants/mocks';
 
-// Componente para cada cartão de empresa
 const EmpresaCard = ({ empresa }: { empresa: EmpresaIncubada }) => {
 	return (
 		<Card className='mb-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow'>
@@ -29,112 +36,141 @@ const EmpresaCard = ({ empresa }: { empresa: EmpresaIncubada }) => {
 	);
 };
 
-// Componente para cada coluna do Kanban
 const KanbanColumn = ({
 	step,
-	onDragStart,
-	onDrop,
-	onDragOver,
+	index,
 }: {
-	step: KanbanStep;
-	onDragStart: (e: React.DragEvent, empresaId: string, sourceStepId: string) => void;
-	onDrop: (e: React.DragEvent, targetStepId: string) => void;
-	onDragOver: (e: React.DragEvent) => void;
+	step: KanbanStep & { empresas: EmpresaIncubada[] };
+	index: number;
 }) => {
 	return (
-		<div
-			className='min-w-[280px] flex-1 bg-blue-50 rounded-md p-3'
-			onDrop={e => onDrop(e, step.id)}
-			onDragOver={onDragOver}
-		>
-			<div className='flex items-center gap-2'>
+		<div className='min-w-[280px] flex-1'>
+			<div className='flex items-center gap-2 mb-3'>
 				<div className='w-3 h-3 rounded-full' style={{ backgroundColor: step.color }} />
 				<h3 className='font-medium text-sm'>
 					{step.titulo} <span className='ml-1 text-blue-500'>({step.empresas.length})</span>
 				</h3>
 			</div>
-			<div className='mt-3 space-y-2'>
-				{step.empresas.map(empresa => (
-					<div key={empresa.id} draggable onDragStart={e => onDragStart(e, empresa.id, step.id)}>
-						<EmpresaCard empresa={empresa} />
+
+			<Droppable droppableId={step.id}>
+				{(droppableProvided, snapshot) => (
+					<div
+						ref={droppableProvided.innerRef}
+						{...droppableProvided.droppableProps}
+						className={`p-3 rounded-md min-h-[150px] ${
+							snapshot.isDraggingOver ? 'bg-blue-100' : 'bg-blue-50'
+						}`}
+					>
+						{step.empresas.map((empresa, empresaIndex) => (
+							<Draggable key={empresa.id} draggableId={empresa.id} index={empresaIndex}>
+								{(provided, snapshot) => (
+									<div
+										ref={provided.innerRef}
+										{...provided.draggableProps}
+										{...provided.dragHandleProps}
+										className={`mb-2 ${snapshot.isDragging ? 'opacity-60' : ''}`}
+									>
+										<EmpresaCard empresa={empresa} />
+									</div>
+								)}
+							</Draggable>
+						))}
+						{droppableProvided.placeholder}
 					</div>
-				))}
-			</div>
+				)}
+			</Droppable>
 		</div>
 	);
 };
 
 export default function Kanban() {
-	const [steps, setSteps] = useState<KanbanStep[]>(kanbanSteps);
-	const [draggedItem, setDraggedItem] = useState<{
-		empresaId: string;
-		sourceStepId: string;
-	} | null>(null);
+	const [showAllIncubadoras, setShowAllIncubadoras] = useState<boolean>(true);
+	const [selectedIncubadoraId, setSelectedIncubadoraId] = useState<string | null>(null);
+	const [incubadorasWithSteps, setIncubadorasWithSteps] = useState<
+		Array<{
+			incubadora: Incubadora;
+			steps: Array<KanbanStep & { empresas: EmpresaIncubada[] }>;
+		}>
+	>([]);
 
-	// Funções para lidar com o drag and drop
-	const handleDragStart = (e: React.DragEvent, empresaId: string, sourceStepId: string) => {
-		setDraggedItem({ empresaId, sourceStepId });
-	};
+	// Prepare data - organize by incubadora and then by steps
+	useEffect(() => {
+		const result = incubadoras.map(incubadora => {
+			// Filter empresas for this incubadora
+			const incubadoraEmpresas = empresasIncubadas.filter(
+				empresa => empresa.incubadoraId === incubadora.id
+			);
 
-	const handleDragOver = (e: React.DragEvent) => {
-		e.preventDefault();
-	};
+			// Create steps with filtered empresas
+			const stepsWithFilteredEmpresas = kanbanSteps.map(step => {
+				const empresasInStep = incubadoraEmpresas.filter(empresa => empresa.stepId === step.id);
 
-	const handleDrop = (e: React.DragEvent, targetStepId: string) => {
-		e.preventDefault();
-
-		if (!draggedItem) return;
-
-		const { empresaId, sourceStepId } = draggedItem;
-
-		// Se estiver arrastando para a mesma coluna, não faz nada
-		if (sourceStepId === targetStepId) {
-			setDraggedItem(null);
-			return;
-		}
-
-		// Encontrar a empresa na coluna de origem
-		const sourceStep = steps.find(step => step.id === sourceStepId);
-		const targetStep = steps.find(step => step.id === targetStepId);
-
-		if (!sourceStep || !targetStep) {
-			setDraggedItem(null);
-			return;
-		}
-
-		// Encontra e remove a empresa da coluna de origem
-		const empresaIndex = sourceStep.empresas.findIndex(e => e.id === empresaId);
-		if (empresaIndex === -1) {
-			setDraggedItem(null);
-			return;
-		}
-
-		const empresa = sourceStep.empresas[empresaIndex];
-
-		// Atualizar o estado
-		const updatedSteps = steps.map(step => {
-			// Remove a empresa da coluna de origem
-			if (step.id === sourceStepId) {
 				return {
 					...step,
-					empresas: step.empresas.filter(e => e.id !== empresaId),
+					empresas: empresasInStep,
 				};
-			}
+			});
 
-			// Adiciona a empresa na coluna de destino
-			if (step.id === targetStepId) {
-				return {
-					...step,
-					empresas: [...step.empresas, empresa],
-				};
-			}
-
-			return step;
+			return {
+				incubadora,
+				steps: stepsWithFilteredEmpresas,
+			};
 		});
 
-		setSteps(updatedSteps);
-		setDraggedItem(null);
+		setIncubadorasWithSteps(result);
+
+		// Set default selected incubadora if none is selected
+		if (!selectedIncubadoraId && incubadoras.length > 0) {
+			setSelectedIncubadoraId(incubadoras[0].id);
+		}
+	}, [selectedIncubadoraId]);
+
+	// Handle drag and drop within a single incubadora's kanban
+	const handleDragEnd = (result: DropResult, incubadoraId: string) => {
+		const { source, destination } = result;
+
+		if (!destination) return;
+		if (source.droppableId === destination.droppableId && source.index === destination.index)
+			return;
+
+		// Find the incubadora being modified
+		const incubadoraIndex = incubadorasWithSteps.findIndex(
+			item => item.incubadora.id === incubadoraId
+		);
+
+		if (incubadoraIndex === -1) return;
+
+		const sourceStepId = source.droppableId;
+		const destinationStepId = destination.droppableId;
+
+		// Get the steps for this incubadora
+		const updatedIncubadorasWithSteps = [...incubadorasWithSteps];
+		const incubadoraSteps = [...updatedIncubadorasWithSteps[incubadoraIndex].steps];
+
+		// Find source and destination step indexes
+		const sourceStepIndex = incubadoraSteps.findIndex(step => step.id === sourceStepId);
+		const destinationStepIndex = incubadoraSteps.findIndex(step => step.id === destinationStepId);
+
+		if (sourceStepIndex === -1 || destinationStepIndex === -1) return;
+
+		// Get the moved empresa
+		const [movedEmpresa] = incubadoraSteps[sourceStepIndex].empresas.splice(source.index, 1);
+
+		// Update the empresa's stepId
+		movedEmpresa.stepId = destinationStepId;
+
+		// Insert at the destination
+		incubadoraSteps[destinationStepIndex].empresas.splice(destination.index, 0, movedEmpresa);
+
+		// Update the state
+		updatedIncubadorasWithSteps[incubadoraIndex].steps = incubadoraSteps;
+		setIncubadorasWithSteps(updatedIncubadorasWithSteps);
 	};
+
+	// Get the incubadora to display based on selection
+	const incubadorasToDisplay = showAllIncubadoras
+		? incubadorasWithSteps
+		: incubadorasWithSteps.filter(item => item.incubadora.id === selectedIncubadoraId);
 
 	return (
 		<div className='space-y-6'>
@@ -145,19 +181,75 @@ export default function Kanban() {
 				</p>
 			</div>
 
-			<div className='bg-blue-50 p-4 rounded-lg shadow'>
-				<div className='flex gap-4 overflow-x-auto pb-4'>
-					{steps.map(step => (
-						<KanbanColumn
-							key={step.id}
-							step={step}
-							onDragStart={handleDragStart}
-							onDrop={handleDrop}
-							onDragOver={handleDragOver}
-						/>
-					))}
+			{/* Display mode toggle */}
+			<div className='flex items-center gap-4'>
+				<div className='flex items-center gap-2'>
+					<input
+						type='radio'
+						id='show-all'
+						name='display-mode'
+						checked={showAllIncubadoras}
+						onChange={() => setShowAllIncubadoras(true)}
+					/>
+					<label htmlFor='show-all' className='text-sm'>
+						Mostrar todas as incubadoras
+					</label>
 				</div>
+
+				<div className='flex items-center gap-2'>
+					<input
+						type='radio'
+						id='show-one'
+						name='display-mode'
+						checked={!showAllIncubadoras}
+						onChange={() => setShowAllIncubadoras(false)}
+					/>
+					<label htmlFor='show-one' className='text-sm'>
+						Selecionar uma incubadora
+					</label>
+				</div>
+
+				{!showAllIncubadoras && (
+					<select
+						value={selectedIncubadoraId || ''}
+						onChange={e => setSelectedIncubadoraId(e.target.value)}
+						className='rounded-md border border-input bg-background px-3 py-1 text-sm'
+						disabled={showAllIncubadoras}
+					>
+						{incubadoras.map(incubadora => (
+							<option key={incubadora.id} value={incubadora.id}>
+								{incubadora.nome}
+							</option>
+						))}
+					</select>
+				)}
 			</div>
+
+			{/* Render a Kanban board for each incubadora */}
+			{incubadorasToDisplay.map(({ incubadora, steps }) => (
+				<div key={incubadora.id} className='mt-8'>
+					<div className='flex items-center gap-3 mb-4'>
+						{incubadora.logo && (
+							<img
+								src={incubadora.logo}
+								alt={incubadora.nome}
+								className='w-8 h-8 rounded-full object-cover'
+							/>
+						)}
+						<h3 className='text-xl font-semibold'>{incubadora.nome}</h3>
+					</div>
+
+					<DragDropContext onDragEnd={result => handleDragEnd(result, incubadora.id)}>
+						<div className='bg-blue-50 p-4 rounded-lg shadow'>
+							<div className='flex gap-4 overflow-x-auto pb-4'>
+								{steps.map((step, index) => (
+									<KanbanColumn key={step.id} step={step} index={index} />
+								))}
+							</div>
+						</div>
+					</DragDropContext>
+				</div>
+			))}
 		</div>
 	);
 }

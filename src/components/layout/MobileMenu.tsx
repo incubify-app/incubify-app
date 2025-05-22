@@ -71,18 +71,7 @@ export function MobileMenu() {
           />
           <div>
             <p className="text-sm font-medium text-white">{user?.name}</p>
-            <p className="text-xs text-gray-400">{user?.startupName}</p>
           </div>
-        </div>
-        <div className="mt-4">
-          <p className="text-xs text-gray-400">Progresso da Startup</p>
-          <div className="progress-bar">
-            <div 
-              className="progress-bar-fill" 
-              style={{ width: `${(user?.startupStage || 0) * 20}%` }} 
-            />
-          </div>
-          <p className="text-xs text-gray-400">Estágio {user?.startupStage || 0}/5</p>
         </div>
       </div>
       <ScrollArea className="flex-1 border-t border-sidebar-border">

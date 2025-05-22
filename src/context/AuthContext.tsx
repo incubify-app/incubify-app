@@ -15,10 +15,34 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
 
-  //TODO: ADD LOGIN INTEGRATION
+	//TODO: ADD LOGIN INTEGRATION
 	const login = async (login: string, password: string): Promise<boolean> => {
 		if (login && password) {
 			try {
+				if (login === 'admin' && password === 'admin') {
+					const mockUser: User = {
+						id: crypto.randomUUID(),
+						name: 'Admin',
+						contactName: 'Admin',
+						address: 'Admin',
+						phone: 'Admin',
+						identification: 'Admin',
+						identificationType: 'pf' as IdentificationType,
+						role: 'management' as CompanyRole,
+						login: 'admin',
+						email: 'admin@mail.com',
+						avatar: 'https://i.pravatar.cc/150?img=32',
+						entrepreneursProfile: 'Admin',
+						proposalCharacterization: 'Admin',
+						financialPlan: 'Admin',
+						market: 'Admin',
+						needs: 'Admin',
+						teamDetails: 'Admin',
+						createdAt: new Date().toISOString(),
+					};
+					setUser(mockUser);
+					return true;
+				}
 				const storedUsers = localStorage.getItem('users');
 				const users: RegisterData[] = storedUsers ? JSON.parse(storedUsers) : [];
 

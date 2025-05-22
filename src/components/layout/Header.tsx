@@ -32,11 +32,7 @@ export function Header() {
 			</div>
 
 			<div className='flex items-center gap-2'>
-				<img
-					src='/lovable-uploads/43e9a23a-d595-4e9b-93a3-6d1b2787a77c.png'
-					alt='Incubify Logo'
-					className='h-6 w-auto hidden sm:block'
-				/>
+				<img src='/incubify-logo.png' alt='Incubify Logo' className='h-8 w-auto' />
 				<h1 className='text-xl font-semibold hidden sm:block'>Incubify</h1>
 			</div>
 

@@ -36,11 +36,7 @@ export function Sidebar() {
 			<div className='p-6'>
 				<div className='flex items-center justify-between'>
 					<div className='flex items-center gap-2'>
-						<img
-							src='/lovable-uploads/43e9a23a-d595-4e9b-93a3-6d1b2787a77c.png'
-							alt='Incubify Logo'
-							className='h-8 w-auto'
-						/>
+						<img src='/incubify-logo.png' alt='Incubify Logo' className='h-8 w-auto' />
 						<h2 className='text-lg font-semibold text-white'>Incubify</h2>
 					</div>
 				</div>
@@ -55,18 +51,7 @@ export function Sidebar() {
 						/>
 						<div>
 							<p className='text-sm font-medium text-white'>{user?.name}</p>
-							<p className='text-xs text-blue-200'>{user?.startupName}</p>
 						</div>
-					</div>
-					<div className='mt-4'>
-						<p className='text-xs text-blue-200'>Progresso da Startup</p>
-						<div className='progress-bar'>
-							<div
-								className='progress-bar-fill'
-								style={{ width: `${(user?.startupStage || 0) * 20}%` }}
-							/>
-						</div>
-						<p className='text-xs text-blue-200'>Estágio {user?.startupStage || 0}/5</p>
 					</div>
 				</div>
 				<ScrollArea className='flex-1'>

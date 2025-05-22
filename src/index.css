@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		--background: 0 0% 100%;
+		--foreground: 210 50% 10%;
+		--card: 0 0% 100%;
+		--card-foreground: 210 50% 10%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 210 50% 10%;
+		--primary: 200 85% 50%;
+		--primary-foreground: 0 0% 100%;
+		--secondary: 195 70% 45%;
+		--secondary-foreground: 0 0% 100%;
+		--muted: 195 40% 95%;
+		--muted-foreground: 210 40% 40%;
+		--accent: 198 60% 90%;
+		--accent-foreground: 210 50% 10%;
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 210 20% 98%;
+		--border: 195 30% 90%;
+		--input: 195 30% 90%;
+		--ring: 200 85% 50%;
+		--radius: 0.5rem;
+		--sidebar-background: 210 50% 15%;
+		--sidebar-foreground: 195 30% 98%;
+		--sidebar-primary: 200 85% 50%;
+		--sidebar-primary-foreground: 0 0% 100%;
+		--sidebar-accent: 198 30% 25%;
+		--sidebar-accent-foreground: 195 30% 98%;
+		--sidebar-border: 198 30% 25%;
+		--sidebar-ring: 200 85% 50%;
+	}
+
+	.dark {
+		--background: 210 50% 10%;
+		--foreground: 195 30% 98%;
+		--card: 210 50% 10%;
+		--card-foreground: 195 30% 98%;
+		--popover: 210 50% 10%;
+		--popover-foreground: 195 30% 98%;
+		--primary: 200 85% 50%;
+		--primary-foreground: 0 0% 100%;
+		--secondary: 198 30% 25%;
+		--secondary-foreground: 195 30% 98%;
+		--muted: 198 30% 25%;
+		--muted-foreground: 195 50% 80%;
+		--accent: 198 30% 25%;
+		--accent-foreground: 195 30% 98%;
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 210 20% 98%;
+		--border: 198 30% 25%;
+		--input: 198 30% 25%;
+		--ring: 200 85% 50%;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+		font-family: 'Inter', sans-serif;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+	}
+}
+
+.progress-bar {
+	width: 100%;
+	height: 8px;
+	background-color: #e2e8f0;
+	border-radius: 9999px;
+	margin: 8px 0;
+}
+
+.progress-bar-fill {
+	height: 100%;
+	border-radius: 9999px;
+	background-color: #2196f3; /* Light blue color for progress bar */
+	transition: width 0.5s ease-in-out;
+}

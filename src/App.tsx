@@ -25,7 +25,7 @@ const App = () => (
 						<Route path='/login' element={<Login />} />
 						<Route path='/register' element={<Register />} />
 						<Route element={<MainLayout />}>
-							<Route path='/dashboard' element={<Dashboard />} />
+							<Route path='/' element={<Dashboard />} />
 							<Route path='/perfil' element={<PlaceholderPage />} />
 							<Route path='/kanban' element={<Kanban />} />
 							<Route path='/documentos' element={<PlaceholderPage />} />

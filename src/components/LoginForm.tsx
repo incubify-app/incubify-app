@@ -19,7 +19,7 @@ export function LoginForm() {
 		try {
 			const success = await loginFn(login, password);
 			if (success) {
-				navigate('/dashboard');
+				navigate('/');
 			}
 		} finally {
 			setIsLoading(false);

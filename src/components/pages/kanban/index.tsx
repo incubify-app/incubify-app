@@ -83,7 +83,7 @@ const KanbanColumn = ({
 	);
 };
 
-export default function Kanban() {
+export function Kanban() {
 	const [showAllIncubadoras, setShowAllIncubadoras] = useState<boolean>(true);
 	const [selectedIncubadoraId, setSelectedIncubadoraId] = useState<string | null>(null);
 	const [incubadorasWithSteps, setIncubadorasWithSteps] = useState<

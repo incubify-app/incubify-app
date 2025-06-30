@@ -7,8 +7,8 @@ import { NavLink } from 'react-router-dom';
 
 const navItems = [
 	{
-		title: 'Dashboard',
-		href: '/dashboard',
+		title: 'Incubadoras',
+		href: '/incubators',
 		icon: Home,
 	},
 	{

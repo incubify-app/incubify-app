@@ -5,12 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MainLayout } from './components/layout/MainLayout';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import NotFound from './pages/NotFound';
-import PlaceholderPage from './pages/PlaceholderPage';
-import Kanban from './pages/Kanban';
+import { Incubators, Kanban, Login, NotFound, PlaceholderPage, Register } from './components/pages';
 
 const queryClient = new QueryClient();
 
@@ -25,10 +20,11 @@ const App = () => (
 						<Route path='/login' element={<Login />} />
 						<Route path='/register' element={<Register />} />
 						<Route element={<MainLayout />}>
-							<Route path='/' element={<Dashboard />} />
+							<Route path='/' element={<Incubators />} />
+							<Route path='/incubators' element={<Incubators />} />
 							<Route path='/perfil' element={<PlaceholderPage />} />
 							<Route path='/kanban' element={<Kanban />} />
-							<Route path='/documentos' element={<PlaceholderPage />} />
+							<Route path='/docs' element={<PlaceholderPage />} />
 						</Route>
 						<Route path='*' element={<NotFound />} />
 					</Routes>

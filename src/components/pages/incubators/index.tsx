@@ -3,12 +3,12 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetIncubators } from '@/hooks/use-get-incubators';
-import { IncubatorCompanies } from './components/incubator-companies';
+import { IncubatorCompanies } from './components';
+import { NavLink } from 'react-router-dom';
 
 export function Incubators() {
 	const { user } = useAuth();
 	const { data, isLoading } = useGetIncubators({ enabled: true });
-	console.log(data);
 
 	return (
 		<div className='space-y-8'>
@@ -162,10 +162,11 @@ export function Incubators() {
 												<IncubatorCompanies incubatorId={incubadora.id} />
 											</div>
 										</div>
-										<div className='mt-4'>
-											<button className='w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors'>
+										<div className='mt-4 w-full'>
+											<NavLink className='flex justify-center w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors'
+											to={`/kanban/${incubadora.id}`}>
 												Ver detalhes
-											</button>
+											</NavLink>
 										</div>
 									</div>
 								</CardContent>

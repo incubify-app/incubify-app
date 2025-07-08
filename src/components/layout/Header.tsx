@@ -36,17 +36,6 @@ export function Header() {
 				<h1 className='text-xl font-semibold hidden sm:block'>Incubify</h1>
 			</div>
 
-			<div className='flex-1 mx-4 hidden md:block'>
-				<div className='relative'>
-					<Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
-					<Input
-						type='search'
-						placeholder='Buscar incubadoras...'
-						className='w-full max-w-lg pl-8'
-					/>
-				</div>
-			</div>
-
 			<div className='flex items-center gap-2'>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>

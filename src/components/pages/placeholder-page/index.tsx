@@ -47,7 +47,7 @@ export function PlaceholderPage() {
 					</div>
 				</CardContent>
 				<CardFooter className='justify-center'>
-					<Button onClick={() => navigate('/dashboard')}>Voltar para Dashboard</Button>
+					<Button onClick={() => navigate('/')}>Voltar para visualização de incubadoras</Button>
 				</CardFooter>
 			</Card>
 		</div>

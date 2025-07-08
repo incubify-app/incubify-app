@@ -2,10 +2,21 @@ import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { MainLayout } from './components/layout/MainLayout';
-import { Incubators, Kanban, Login, NotFound, PlaceholderPage, Register } from './components/pages';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { CompanyRole } from './types/company';
+import {
+	Documents,
+	Incubators,
+	Kanban,
+	Login,
+	NotFound,
+	Profile,
+	PlaceholderPage,
+	Register,
+} from './components/pages';
 
 const queryClient = new QueryClient();
 
@@ -20,11 +31,62 @@ const App = () => (
 						<Route path='/login' element={<Login />} />
 						<Route path='/register' element={<Register />} />
 						<Route element={<MainLayout />}>
-							<Route path='/' element={<Incubators />} />
-							<Route path='/incubators' element={<Incubators />} />
-							<Route path='/perfil' element={<PlaceholderPage />} />
-							<Route path='/kanban' element={<Kanban />} />
-							<Route path='/docs' element={<PlaceholderPage />} />
+							<Route
+								path='/'
+								element={
+									<ProtectedRoute allowedRoles={[CompanyRole.MANAGEMENT]}>
+										<Incubators />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path='/incubators'
+								element={
+									<ProtectedRoute allowedRoles={[CompanyRole.MANAGEMENT]}>
+										<Incubators />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path='/profile'
+								element={
+									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP, CompanyRole.MANAGEMENT]}>
+										<Profile />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path='/kanban/:incubatorId?'
+								element={
+									<ProtectedRoute allowedRoles={[CompanyRole.MANAGEMENT]}>
+										<Kanban />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path='/my-path'
+								element={
+									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP]}>
+										<Kanban />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path='/documents'
+								element={
+									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP]}>
+										<Documents />
+									</ProtectedRoute>
+								}
+							/>
+							<Route
+								path='/docs'
+								element={
+									<ProtectedRoute>
+										<PlaceholderPage />
+									</ProtectedRoute>
+								}
+							/>
 						</Route>
 						<Route path='*' element={<NotFound />} />
 					</Routes>

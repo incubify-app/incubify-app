@@ -1,13 +1,21 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { User, RegisterData, IdentificationType, CompanyRole } from '../types/auth';
+import { User, RegisterData } from '../types/auth';
 import { toast } from '@/components/ui/use-toast';
+import { CompanyRole, IdentificationType } from '@/types/company';
 
 interface AuthContextType {
 	user: User | null;
 	isAuthenticated: boolean;
-	login: (login: string, password: string) => Promise<boolean>;
+	login: (
+		login: string,
+		password: string
+	) => Promise<{
+		success: boolean;
+		user?: User;
+	}>;
 	register: (registerData: RegisterData) => Promise<boolean>;
 	logout: () => void;
+	updateUser: (userData: Partial<User>) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,19 +24,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<User | null>(null);
 
 	//TODO: ADD LOGIN INTEGRATION
-	const login = async (login: string, password: string): Promise<boolean> => {
+	const login = async (
+		login: string,
+		password: string
+	): Promise<{
+		success: boolean;
+		user?: User;
+	}> => {
 		if (login && password) {
 			try {
 				if (login === 'admin' && password === 'admin') {
 					const mockUser: User = {
-						id: crypto.randomUUID(),
+						id: '71aacba7-818e-4563-9f71-e7ddfe0c8c1e',
 						name: 'Admin',
 						contactName: 'Admin',
 						address: 'Admin',
 						phone: 'Admin',
 						identification: 'Admin',
-						identificationType: 'pf' as IdentificationType,
-						role: 'management' as CompanyRole,
+						identificationType: IdentificationType.PF,
+						role: CompanyRole.STARTUP,
 						login: 'admin',
 						email: 'admin@mail.com',
 						avatar: 'https://i.pravatar.cc/150?img=32',
@@ -41,7 +55,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 						createdAt: new Date().toISOString(),
 					};
 					setUser(mockUser);
-					return true;
+					return {
+						success: true,
+						user: mockUser,
+					};
 				}
 				const storedUsers = localStorage.getItem('users');
 				const users: RegisterData[] = storedUsers ? JSON.parse(storedUsers) : [];
@@ -77,7 +94,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 						description: `Bem-vindo de volta, ${mockUser.contactName}!`,
 					});
 
-					return true;
+					return {
+						success: true,
+						user: mockUser,
+					};
 				} else {
 					toast({
 						title: 'Falha no login',
@@ -85,7 +105,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 						variant: 'destructive',
 					});
 
-					return false;
+					return {
+						success: false,
+					};
 				}
 			} catch (error) {
 				toast({
@@ -94,7 +116,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					variant: 'destructive',
 				});
 
-				return false;
+				return {
+					success: false,
+				};
 			}
 		}
 
@@ -104,7 +128,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			variant: 'destructive',
 		});
 
-		return false;
+		return {
+			success: false,
+		};
 	};
 
 	const register = async (registerData: RegisterData): Promise<boolean> => {
@@ -233,8 +259,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		});
 	};
 
+	const updateUser = async (userData: Partial<User>): Promise<boolean> => {
+		try {
+			setUser(prev => (prev ? { ...prev, ...userData } : null));
+			return true;
+		} catch (error) {
+			console.error('Failed to update user:', error);
+			throw error;
+		}
+	};
+
 	return (
-		<AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout }}>
+		<AuthContext.Provider
+			value={{ user, isAuthenticated: !!user, login, register, logout, updateUser }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

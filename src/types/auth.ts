@@ -1,5 +1,9 @@
 import { Company } from './company';
 
-export type User = Company;
+export interface User extends Company {
+	login: string;
+}
 
-export type RegisterData = Omit<Company, 'id' | 'createdAt'>
+export type RegisterData = Omit<Company, 'id' | 'createdAt'> & {
+	login: string;
+};

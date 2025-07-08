@@ -1,5 +1,12 @@
-export type IdentificationType = 'pf' | 'pj';
-export type CompanyRole = 'startup' | 'management';
+export enum IdentificationType {
+	PF = 'pf',
+	PJ = 'pj',
+}
+
+export enum CompanyRole {
+	STARTUP = 'startup',
+	MANAGEMENT = 'management',
+}
 
 export interface Company {
 	id: string;

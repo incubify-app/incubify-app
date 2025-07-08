@@ -1,255 +1,116 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import {
-	kanbanSteps,
-	KanbanStep,
-	EmpresaIncubada,
-	empresasIncubadas,
-	incubadoras,
-	Incubadora,
-} from '@/constants/mocks';
-
-const EmpresaCard = ({ empresa }: { empresa: EmpresaIncubada }) => {
-	return (
-		<Card className='mb-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow'>
-			<CardContent className='p-3'>
-				<div className='flex items-center gap-3'>
-					{empresa.logo && (
-						<img
-							src={empresa.logo}
-							alt={empresa.nome}
-							className='w-10 h-10 rounded-full object-cover'
-						/>
-					)}
-					<div className='flex-1'>
-						<h4 className='font-medium text-sm'>{empresa.nome}</h4>
-						<p className='text-xs text-blue-600 line-clamp-2'>{empresa.descricao}</p>
-					</div>
-				</div>
-				<div className='mt-2 flex justify-between items-center text-xs text-blue-600'>
-					<span>Resp: {empresa.responsavel}</span>
-					<span>{new Date(empresa.data).toLocaleDateString()}</span>
-				</div>
-			</CardContent>
-		</Card>
-	);
-};
-
-const KanbanColumn = ({
-	step,
-	index,
-}: {
-	step: KanbanStep & { empresas: EmpresaIncubada[] };
-	index: number;
-}) => {
-	return (
-		<div className='min-w-[280px] flex-1'>
-			<div className='flex items-center gap-2 mb-3'>
-				<div className='w-3 h-3 rounded-full' style={{ backgroundColor: step.color }} />
-				<h3 className='font-medium text-sm'>
-					{step.titulo} <span className='ml-1 text-blue-500'>({step.empresas.length})</span>
-				</h3>
-			</div>
-
-			<Droppable droppableId={step.id}>
-				{(droppableProvided, snapshot) => (
-					<div
-						ref={droppableProvided.innerRef}
-						{...droppableProvided.droppableProps}
-						className={`p-3 rounded-md min-h-[150px] ${
-							snapshot.isDraggingOver ? 'bg-blue-100' : 'bg-blue-50'
-						}`}
-					>
-						{step.empresas.map((empresa, empresaIndex) => (
-							<Draggable key={empresa.id} draggableId={empresa.id} index={empresaIndex}>
-								{(provided, snapshot) => (
-									<div
-										ref={provided.innerRef}
-										{...provided.draggableProps}
-										{...provided.dragHandleProps}
-										className={`mb-2 ${snapshot.isDragging ? 'opacity-60' : ''}`}
-									>
-										<EmpresaCard empresa={empresa} />
-									</div>
-								)}
-							</Draggable>
-						))}
-						{droppableProvided.placeholder}
-					</div>
-				)}
-			</Droppable>
-		</div>
-	);
-};
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
+import { useGetIncubators } from '@/hooks/use-get-incubators';
+import { useGetKanbans } from '@/hooks/use-get-kanbans';
+import { useQueryClient } from '@tanstack/react-query';
+import { Step } from '@/types/step';
+import { Steps } from './components';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
+import { CompanyRole } from '@/types/company';
 
 export function Kanban() {
-	const [showAllIncubadoras, setShowAllIncubadoras] = useState<boolean>(true);
-	const [selectedIncubadoraId, setSelectedIncubadoraId] = useState<string | null>(null);
-	const [incubadorasWithSteps, setIncubadorasWithSteps] = useState<
-		Array<{
-			incubadora: Incubadora;
-			steps: Array<KanbanStep & { empresas: EmpresaIncubada[] }>;
-		}>
-	>([]);
+	const { incubatorId } = useParams();
+	const { data: kanbans, isLoading } = useGetKanbans();
+	const { map: incubadoras } = useGetIncubators();
+	const queryClient = useQueryClient();
+	const {
+		user: { role },
+	} = useAuth();
 
-	// Prepare data - organize by incubadora and then by steps
-	useEffect(() => {
-		const result = incubadoras.map(incubadora => {
-			// Filter empresas for this incubadora
-			const incubadoraEmpresas = empresasIncubadas.filter(
-				empresa => empresa.incubadoraId === incubadora.id
-			);
-
-			// Create steps with filtered empresas
-			const stepsWithFilteredEmpresas = kanbanSteps.map(step => {
-				const empresasInStep = incubadoraEmpresas.filter(empresa => empresa.stepId === step.id);
-
-				return {
-					...step,
-					empresas: empresasInStep,
-				};
-			});
-
-			return {
-				incubadora,
-				steps: stepsWithFilteredEmpresas,
-			};
-		});
-
-		setIncubadorasWithSteps(result);
-
-		// Set default selected incubadora if none is selected
-		if (!selectedIncubadoraId && incubadoras.length > 0) {
-			setSelectedIncubadoraId(incubadoras[0].id);
-		}
-	}, [selectedIncubadoraId]);
-
-	// Handle drag and drop within a single incubadora's kanban
-	const handleDragEnd = (result: DropResult, incubadoraId: string) => {
-		const { source, destination } = result;
+	// Handle drag and drop within a kanban
+	const handleDragEnd = async (result: DropResult) => {
+		const { source, destination, draggableId } = result;
 
 		if (!destination) return;
 		if (source.droppableId === destination.droppableId && source.index === destination.index)
 			return;
 
-		// Find the incubadora being modified
-		const incubadoraIndex = incubadorasWithSteps.findIndex(
-			item => item.incubadora.id === incubadoraId
-		);
-
-		if (incubadoraIndex === -1) return;
-
 		const sourceStepId = source.droppableId;
 		const destinationStepId = destination.droppableId;
+		const companyId = draggableId;
 
-		// Get the steps for this incubadora
-		const updatedIncubadorasWithSteps = [...incubadorasWithSteps];
-		const incubadoraSteps = [...updatedIncubadorasWithSteps[incubadoraIndex].steps];
+		try {
+			// Optimistically update the cache
+			const kanbansData = kanbans || [];
 
-		// Find source and destination step indexes
-		const sourceStepIndex = incubadoraSteps.findIndex(step => step.id === sourceStepId);
-		const destinationStepIndex = incubadoraSteps.findIndex(step => step.id === destinationStepId);
+			for (const kanban of kanbansData) {
+				// Get current steps data from cache
+				const stepsQueryKey = ['steps', kanban.id];
+				const currentSteps = queryClient.getQueryData(stepsQueryKey) as Step[] | undefined;
 
-		if (sourceStepIndex === -1 || destinationStepIndex === -1) return;
+				if (!currentSteps) continue;
 
-		// Get the moved empresa
-		const [movedEmpresa] = incubadoraSteps[sourceStepIndex].empresas.splice(source.index, 1);
+				const sourceStep = currentSteps.find(step => step.id === sourceStepId);
+				const destinationStep = currentSteps.find(step => step.id === destinationStepId);
 
-		// Update the empresa's stepId
-		movedEmpresa.stepId = destinationStepId;
+				if (!sourceStep || !destinationStep) continue;
 
-		// Insert at the destination
-		incubadoraSteps[destinationStepIndex].empresas.splice(destination.index, 0, movedEmpresa);
+				// Create updated steps
+				const updatedSteps = currentSteps.map(step => {
+					if (step.id === sourceStepId) {
+						// Remove company from source step
+						const newCompanyIds = [...step.company_ids];
+						newCompanyIds.splice(source.index, 1);
+						return { ...step, company_ids: newCompanyIds };
+					}
 
-		// Update the state
-		updatedIncubadorasWithSteps[incubadoraIndex].steps = incubadoraSteps;
-		setIncubadorasWithSteps(updatedIncubadorasWithSteps);
+					if (step.id === destinationStepId) {
+						// Add company to destination step
+						const newCompanyIds = [...step.company_ids];
+						newCompanyIds.splice(destination.index, 0, companyId);
+						return { ...step, company_ids: newCompanyIds };
+					}
+
+					return step;
+				});
+
+				// Update the query cache
+				queryClient.setQueryData(stepsQueryKey, updatedSteps);
+			}
+
+			// TODO: Call API to persist the change on the server
+			// await updateStepCompanies(sourceStepId, destinationStepId, companyId, source.index, destination.index);
+		} catch (error) {
+			console.error('Error handling drag and drop:', error);
+
+			// Revert optimistic updates on error
+			// TODO: Implement proper error handling and cache reversion
+			queryClient.invalidateQueries({ queryKey: ['steps'] });
+		}
 	};
-
-	// Get the incubadora to display based on selection
-	const incubadorasToDisplay = showAllIncubadoras
-		? incubadorasWithSteps
-		: incubadorasWithSteps.filter(item => item.incubadora.id === selectedIncubadoraId);
 
 	return (
 		<div className='space-y-6'>
 			<div>
 				<h2 className='text-3xl font-bold tracking-tight'>Kanban de Startups</h2>
 				<p className='text-muted-foreground'>
-					Acompanhe o progresso das startups no processo de incubação.
+					{role === CompanyRole.MANAGEMENT
+						? 'Arraste e solte as startups entre os estágios do processo de incubação.'
+						: 'Visualize o progresso das startups em cada estágio do processo de incubação.'}
 				</p>
 			</div>
 
-			{/* Display mode toggle */}
-			<div className='flex items-center gap-4'>
-				<div className='flex items-center gap-2'>
-					<input
-						type='radio'
-						id='show-all'
-						name='display-mode'
-						checked={showAllIncubadoras}
-						onChange={() => setShowAllIncubadoras(true)}
-					/>
-					<label htmlFor='show-all' className='text-sm'>
-						Mostrar todas as incubadoras
-					</label>
-				</div>
-
-				<div className='flex items-center gap-2'>
-					<input
-						type='radio'
-						id='show-one'
-						name='display-mode'
-						checked={!showAllIncubadoras}
-						onChange={() => setShowAllIncubadoras(false)}
-					/>
-					<label htmlFor='show-one' className='text-sm'>
-						Selecionar uma incubadora
-					</label>
-				</div>
-
-				{!showAllIncubadoras && (
-					<select
-						value={selectedIncubadoraId || ''}
-						onChange={e => setSelectedIncubadoraId(e.target.value)}
-						className='rounded-md border border-input bg-background px-3 py-1 text-sm'
-						disabled={showAllIncubadoras}
-					>
-						{incubadoras.map(incubadora => (
-							<option key={incubadora.id} value={incubadora.id}>
-								{incubadora.nome}
-							</option>
-						))}
-					</select>
-				)}
-			</div>
-
 			{/* Render a Kanban board for each incubadora */}
-			{incubadorasToDisplay.map(({ incubadora, steps }) => (
-				<div key={incubadora.id} className='mt-8'>
-					<div className='flex items-center gap-3 mb-4'>
-						{incubadora.logo && (
-							<img
-								src={incubadora.logo}
-								alt={incubadora.nome}
-								className='w-8 h-8 rounded-full object-cover'
-							/>
-						)}
-						<h3 className='text-xl font-semibold'>{incubadora.nome}</h3>
-					</div>
+			{isLoading ? (
+				<div className='text-center text-muted-foreground'>Carregando kanbans...</div>
+			) : (
+				kanbans.map(kanban => {
+					const incubadora = incubadoras.get(kanban.incubator_id);
+					if (!incubadora) return null;
 
-					<DragDropContext onDragEnd={result => handleDragEnd(result, incubadora.id)}>
-						<div className='bg-blue-50 p-4 rounded-lg shadow'>
-							<div className='flex gap-4 overflow-x-auto pb-4'>
-								{steps.map((step, index) => (
-									<KanbanColumn key={step.id} step={step} index={index} />
-								))}
+					return (
+						<div key={kanban.id} className='mt-8'>
+							<div className='flex items-center gap-3 mb-4'>
+								<h3 className='text-xl font-semibold'>{incubadora.name}</h3>
 							</div>
+
+							<DragDropContext onDragEnd={handleDragEnd}>
+								<Steps kanbanId={kanban.id} isSelected={incubatorId === kanban.incubator_id} />
+							</DragDropContext>
 						</div>
-					</DragDropContext>
-				</div>
-			))}
+					);
+				})
+			)}
 		</div>
 	);
 }

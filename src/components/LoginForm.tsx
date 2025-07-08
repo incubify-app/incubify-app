@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { CompanyRole } from '@/types/company';
 
 export function LoginForm() {
 	const [login, setLogin] = useState('');
@@ -11,15 +12,19 @@ export function LoginForm() {
 	const [isLoading, setIsLoading] = useState(false);
 	const { login: loginFn } = useAuth();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		try {
-			const success = await loginFn(login, password);
+			const { success, user } = await loginFn(login, password);
 			if (success) {
-				navigate('/');
+				const { role } = user;
+				const from =
+					location.state?.from || (role === CompanyRole.MANAGEMENT ? '/incubators' : '/my-path');
+				navigate(from, { replace: true });
 			}
 		} finally {
 			setIsLoading(false);

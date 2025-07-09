@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { RefreshCw, FileText } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { CompanyRole } from '@/types/company';
 
 export const Documents = () => {
 	const { user } = useAuth();
@@ -44,7 +45,7 @@ export const Documents = () => {
 					<Button variant='outline' size='icon' onClick={() => refetch()}>
 						<RefreshCw className='h-4 w-4' />
 					</Button>
-					<DocumentUploadDialog companyId={companyId} />
+					{user.role === CompanyRole.MANAGEMENT && <DocumentUploadDialog companyId={companyId} />}
 				</div>
 			</CardHeader>
 			<CardContent className='flex-1 overflow-auto'>

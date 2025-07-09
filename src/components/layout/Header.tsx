@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
-import { Search, Menu, User as UserIcon } from 'lucide-react';
+import { Menu, User as UserIcon } from 'lucide-react';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,6 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MobileMenu } from './MobileMenu';
+import { Badge } from '../ui/badge';
+import { CompanyRole } from '@/types/company';
 
 export function Header() {
 	const { user, logout } = useAuth();
@@ -34,6 +35,9 @@ export function Header() {
 			<div className='flex items-center gap-2'>
 				<img src='/incubify-logo.png' alt='Incubify Logo' className='h-8 w-auto' />
 				<h1 className='text-xl font-semibold hidden sm:block'>Incubify</h1>
+				<Badge className='hidden sm:block'>
+					{user.role === CompanyRole.MANAGEMENT ? 'Gestão' : 'Incubação'}
+				</Badge>
 			</div>
 
 			<div className='flex items-center gap-2'>

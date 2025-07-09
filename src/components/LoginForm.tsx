@@ -3,28 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { CompanyRole } from '@/types/company';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export function LoginForm() {
-	const [login, setLogin] = useState('');
+	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const { login: loginFn } = useAuth();
 	const navigate = useNavigate();
-	const location = useLocation();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setIsLoading(true);
 
 		try {
-			const { success, user } = await loginFn(login, password);
-			if (success) {
-				const { role } = user;
-				const from =
-					location.state?.from || (role === CompanyRole.MANAGEMENT ? '/incubators' : '/my-path');
-				navigate(from, { replace: true });
+			const { success, redirectTo } = await loginFn(email, password);
+			if (success && redirectTo) {
+				navigate(redirectTo, { replace: true });
 			}
 		} finally {
 			setIsLoading(false);
@@ -41,13 +36,13 @@ export function LoginForm() {
 			</div>
 			<form onSubmit={handleSubmit} className='space-y-4'>
 				<div className='space-y-2'>
-					<Label htmlFor='login'>Login</Label>
+					<Label htmlFor='email'>Email</Label>
 					<Input
-						id='login'
-						placeholder='Seu nome de usuário'
+						id='email'
+						placeholder='Email da sua empresa'
 						required
-						value={login}
-						onChange={e => setLogin(e.target.value)}
+						value={email}
+						onChange={e => setEmail(e.target.value)}
 					/>
 				</div>
 				<div className='space-y-2'>

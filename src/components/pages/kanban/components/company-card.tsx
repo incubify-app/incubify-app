@@ -12,7 +12,8 @@ export const CompanyCard = ({ company }: { company: Company }) => {
 			className={cn(
 				id === company.id && 'border-2 border-blue-400',
 				role === CompanyRole.MANAGEMENT && 'cursor-pointer hover:shadow-md transition-shadow',
-				'mb-3 shadow-sm cursor-not-allowed select-none'
+				role !== CompanyRole.MANAGEMENT && 'cursor-not-allowed',
+				'mb-3 shadow-sm select-none'
 			)}
 		>
 			<CardContent className='p-3'>
@@ -23,7 +24,7 @@ export const CompanyCard = ({ company }: { company: Company }) => {
 					</div>
 				</div>
 				<div className='mt-2 flex justify-between items-center text-xs text-blue-600'>
-					<span>Resp: {company.contactName}</span>
+					<span>Resp: {company.contact_name}</span>
 				</div>
 			</CardContent>
 		</Card>

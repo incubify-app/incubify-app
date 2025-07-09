@@ -11,7 +11,7 @@ export enum CompanyRole {
 export interface Company {
 	id: string;
 	name: string;
-	contactName: string;
+	contact_name: string;
 	address: string;
 	phone?: string;
 	identification: string;

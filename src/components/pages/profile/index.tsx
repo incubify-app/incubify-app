@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Pencil, Save, X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { User } from '@/types/auth';
+import { getInitials } from '@/lib/utils';
 
 interface UserFormData {
 	name: string;
@@ -59,16 +60,6 @@ export const Profile = () => {
 		setIsEditing(false);
 	};
 
-	const getInitials = (name: string) => {
-		if (!name) return 'U';
-		return name
-			.split(' ')
-			.filter(part => part.length > 0)
-			.map(n => n[0])
-			.join('')
-			.toUpperCase()
-			.slice(0, 2);
-	};
 
 	return (
 		<div className='container mx-auto px-4 py-8 max-w-2xl'>
@@ -178,16 +169,16 @@ export const Profile = () => {
 
 							{/* Contact Name field */}
 							<div className='grid gap-2'>
-								<Label htmlFor='contactName'>Nome de contato</Label>
+								<Label htmlFor='contact_name'>Nome de contato</Label>
 								{isEditing ? (
 									<Input
-										id='contactName'
-										value={formData.contactName}
-										onChange={e => handleInputChange('contactName', e.target.value)}
+										id='contact_name'
+										value={formData.contact_name}
+										onChange={e => handleInputChange('contact_name', e.target.value)}
 										disabled={isLoading}
 									/>
 								) : (
-									<p className='p-2 bg-muted rounded-md'>{user?.contactName || 'Não informado'}</p>
+									<p className='p-2 bg-muted rounded-md'>{user?.contact_name || 'Não informado'}</p>
 								)}
 							</div>
 

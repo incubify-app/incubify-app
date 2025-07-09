@@ -12,9 +12,13 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MobileMenu } from './MobileMenu';
 import { Badge } from '../ui/badge';
 import { CompanyRole } from '@/types/company';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { getInitials } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 export function Header() {
 	const { user, logout } = useAuth();
+	const navigate = useNavigate();
 
 	return (
 		<header className='border-b bg-background px-4 py-3 flex items-center justify-between'>
@@ -44,11 +48,10 @@ export function Header() {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant='ghost' size='icon' className='rounded-full'>
-							<img
-								src={user?.avatar || 'https://i.pravatar.cc/150?img=32'}
-								alt='Avatar'
-								className='rounded-full h-8 w-8'
-							/>
+							<Avatar className='h-8 w-8'>
+								<AvatarImage src={user?.avatar} alt={user?.name} />
+								<AvatarFallback className='text-sm'>{getInitials(user?.name || '')}</AvatarFallback>
+							</Avatar>
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end' className='w-56'>
@@ -57,13 +60,18 @@ export function Header() {
 								<UserIcon className='h-4 w-4 text-primary' />
 							</div>
 							<div className='flex flex-col space-y-0.5'>
-								<p className='text-sm font-medium'>{user?.contactName || 'Usuário'}</p>
+								<p className='text-sm font-medium'>{user?.contact_name || 'Usuário'}</p>
 								<p className='text-xs text-muted-foreground'>{user?.name || 'Empresa'}</p>
 							</div>
 						</div>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem>Perfil</DropdownMenuItem>
-						<DropdownMenuItem>Configurações</DropdownMenuItem>
+						<DropdownMenuItem
+							onClick={() => {
+								navigate('/profile');
+							}}
+						>
+							Perfil
+						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={logout}>Sair</DropdownMenuItem>
 					</DropdownMenuContent>

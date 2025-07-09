@@ -56,11 +56,6 @@ export function Sidebar() {
 			<div className='flex flex-1 flex-col overflow-hidden'>
 				<div className='p-4'>
 					<div className='flex items-center gap-4'>
-						<img
-							src={user?.avatar || 'https://i.pravatar.cc/150?img=32'}
-							alt='Avatar'
-							className='h-10 w-10 rounded-full'
-						/>
 						<div>
 							<p className='text-sm font-medium text-white'>{user?.name}</p>
 						</div>

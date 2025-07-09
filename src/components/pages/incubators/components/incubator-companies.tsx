@@ -1,8 +1,8 @@
 import React from 'react';
-import { useGetCompanies } from '@/hooks/use-get-companies';
+import { useGetCompaniesIncubator } from '@/hooks/use-get-companies-incubator';
 
 export const IncubatorCompanies = React.memo(({ incubatorId }: { incubatorId: string }) => {
-	const { data } = useGetCompanies({
+	const { data } = useGetCompaniesIncubator({
 		incubatorId,
 	});
 
@@ -14,6 +14,9 @@ export const IncubatorCompanies = React.memo(({ incubatorId }: { incubatorId: st
 					<span className='text-sm'>{empresa.name}</span>
 				</div>
 			))}
+			{data?.length === 0 && (
+				<div className='text-sm text-gray-600'>Nenhuma empresa incubada</div>
+			)}
 		</>
 	);
 });

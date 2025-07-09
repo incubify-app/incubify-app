@@ -37,3 +37,14 @@ export function bytesToSize(bytes: number): string {
 	const i = Math.floor(Math.log(bytes) / Math.log(1024));
 	return `${Math.round(bytes / Math.pow(1024, i))} ${sizes[i]}`;
 }
+
+export const getInitials = (name: string) => {
+	if (!name) return 'U';
+	return name
+		.split(' ')
+		.filter(part => part.length > 0)
+		.map(n => n[0])
+		.join('')
+		.toUpperCase()
+		.slice(0, 2);
+};

@@ -12,6 +12,7 @@ import {
 	Incubators,
 	Kanban,
 	Login,
+	MyPath,
 	NotFound,
 	Profile,
 	PlaceholderPage,
@@ -64,10 +65,10 @@ const App = () => (
 								}
 							/>
 							<Route
-								path='/my-path'
+								path='/my-path/:incubatorId?'
 								element={
 									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP]}>
-										<Kanban />
+										<MyPath />
 									</ProtectedRoute>
 								}
 							/>

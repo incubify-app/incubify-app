@@ -8,7 +8,7 @@ import { NavLink } from 'react-router-dom';
 
 export function Incubators() {
 	const { user } = useAuth();
-	const { data, isLoading } = useGetIncubators({ enabled: true });
+	const { data, isLoading } = useGetIncubators();
 
 	return (
 		<div className='space-y-8'>
@@ -130,11 +130,6 @@ export function Incubators() {
 						data?.map(incubadora => (
 							<Card key={incubadora.id} className='overflow-hidden'>
 								<div className='h-32 bg-muted flex items-center justify-center p-4'>
-									{/* <img
-									src={incubadora.logo}
-									alt={`${incubadora.name} logo`}
-									className='h-full object-cover rounded-md'
-								/> */}
 								</div>
 								<CardHeader className='pb-2'>
 									<div className='flex items-start justify-between'>

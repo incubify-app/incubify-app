@@ -14,7 +14,7 @@ export const Documents = () => {
 	const { user } = useAuth();
 	const { id: companyId } = user;
 	const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
-	const { data: documents, isLoading, error, refetch } = useDocumentsByCompany(companyId || '');
+	const { data: documents, isLoading, error, refetch } = useDocumentsByCompany();
 
 	const deleteDocumentMutation = useDeleteDocument(companyId || '');
 
@@ -37,8 +37,8 @@ export const Documents = () => {
 		<Card className='flex flex-col h-full'>
 			<CardHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
 				<div>
-					<CardTitle>Seus documentos</CardTitle>
-					<CardDescription>Gerenciar documentos da empresa</CardDescription>
+					<CardTitle>Documentos</CardTitle>
+					<CardDescription>Gerenciar documentos</CardDescription>
 				</div>
 				<div className='flex items-center gap-2'>
 					<Button variant='outline' size='icon' onClick={() => refetch()}>

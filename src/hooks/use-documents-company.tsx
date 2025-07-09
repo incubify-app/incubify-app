@@ -1,19 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-	getDocumentsByCompany,
-} from '../services/get-documents-by-company';
+import { getDocuments } from '../services/get-documents';
 import { Document } from '@/types/document';
 
 /**
- * React Query hook to fetch documents for a specific company
- * @param companyId - The ID of the company to fetch documents for
+ * React Query hook to fetch documents
  * @returns Query result containing documents data, loading state, and error
  */
-export const useDocumentsByCompany = (companyId: string) => {
+export const useDocumentsByCompany = () => {
 	return useQuery<Document[]>({
-		queryKey: ['documents', companyId],
-		queryFn: () => getDocumentsByCompany(companyId),
-		enabled: !!companyId,
+		queryKey: ['documents'],
+		queryFn: () => getDocuments(),
 		staleTime: 5 * 60 * 1000,
 	});
 };

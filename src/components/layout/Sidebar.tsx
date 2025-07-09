@@ -35,7 +35,7 @@ const navItems = [
 		title: 'Documentos',
 		href: '/documents',
 		icon: FileText,
-		roleView: [CompanyRole.STARTUP],
+		roleView: [CompanyRole.STARTUP, CompanyRole.MANAGEMENT],
 	},
 ];
 

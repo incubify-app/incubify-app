@@ -5,6 +5,8 @@ import { useDownloadDocument } from '@/hooks/use-download-document';
 import { formatDistanceToNow } from 'date-fns';
 import { bytesToSize } from '@/lib/utils';
 import { ptBR } from 'date-fns/locale';
+import { useAuth } from '@/context/AuthContext';
+import { CompanyRole } from '@/types/company';
 
 interface DocumentItemProps {
 	document: Document;
@@ -13,6 +15,9 @@ interface DocumentItemProps {
 
 export function DocumentItem({ document, onDelete }: DocumentItemProps) {
 	const downloadMutation = useDownloadDocument();
+	const {
+		user: { role },
+	} = useAuth();
 
 	const handleDownload = () => {
 		downloadMutation.mutate(document.id);
@@ -50,9 +55,11 @@ export function DocumentItem({ document, onDelete }: DocumentItemProps) {
 				>
 					<Download className='h-4 w-4' />
 				</Button>
-				<Button variant='ghost' size='icon' onClick={handleDelete}>
-					<Trash2 className='h-4 w-4 text-destructive' />
-				</Button>
+				{role === CompanyRole.MANAGEMENT && (
+					<Button variant='ghost' size='icon' onClick={handleDelete}>
+						<Trash2 className='h-4 w-4 text-destructive' />
+					</Button>
+				)}
 			</div>
 		</div>
 	);

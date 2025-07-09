@@ -75,7 +75,7 @@ const App = () => (
 							<Route
 								path='/documents'
 								element={
-									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP]}>
+									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP, CompanyRole.MANAGEMENT]}>
 										<Documents />
 									</ProtectedRoute>
 								}

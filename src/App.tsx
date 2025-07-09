@@ -43,7 +43,7 @@ const App = () => (
 							<Route
 								path='/incubators'
 								element={
-									<ProtectedRoute allowedRoles={[CompanyRole.MANAGEMENT]}>
+									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP, CompanyRole.MANAGEMENT]}>
 										<Incubators />
 									</ProtectedRoute>
 								}
@@ -59,16 +59,8 @@ const App = () => (
 							<Route
 								path='/kanban/:incubatorId?'
 								element={
-									<ProtectedRoute allowedRoles={[CompanyRole.MANAGEMENT]}>
+									<ProtectedRoute allowedRoles={[CompanyRole.MANAGEMENT, CompanyRole.STARTUP]}>
 										<Kanban />
-									</ProtectedRoute>
-								}
-							/>
-							<Route
-								path='/my-path/:incubatorId?'
-								element={
-									<ProtectedRoute allowedRoles={[CompanyRole.STARTUP]}>
-										<MyPath />
 									</ProtectedRoute>
 								}
 							/>

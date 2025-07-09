@@ -11,7 +11,7 @@ const navItems = [
 		title: 'Incubadoras',
 		href: '/incubators',
 		icon: Home,
-		roleView: [CompanyRole.MANAGEMENT],
+		roleView: [CompanyRole.STARTUP, CompanyRole.MANAGEMENT],
 	},
 	{
 		title: 'Perfil/Dados',
@@ -23,13 +23,7 @@ const navItems = [
 		title: 'Kanban',
 		href: '/kanban',
 		icon: Gauge,
-		roleView: [CompanyRole.MANAGEMENT],
-	},
-	{
-		title: 'Meu caminho',
-		href: '/my-path',
-		icon: Gauge,
-		roleView: [CompanyRole.STARTUP],
+		roleView: [CompanyRole.STARTUP, CompanyRole.MANAGEMENT],
 	},
 	{
 		title: 'Documentos',

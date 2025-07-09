@@ -1,21 +1,11 @@
-import { useAuth } from '@/context/AuthContext';
 import { getAllIncubators } from '@/services/get-all-incubators';
-import { getCompanyIncubator } from '@/services/get-company-incubators';
-import { CompanyRole } from '@/types/company';
 import { useQuery } from '@tanstack/react-query';
 
 export function useGetIncubators() {
-	const {
-		user: { id, role },
-	} = useAuth();
 	const { data, error, isLoading } = useQuery({
 		queryKey: ['incubators'],
 		queryFn: async () => {
-			if (role === CompanyRole.MANAGEMENT) {
-				return getAllIncubators();
-			}
-
-			return getCompanyIncubator(id);
+			return getAllIncubators();
 		},
 		refetchInterval: false,
 		refetchOnWindowFocus: false,

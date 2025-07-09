@@ -41,7 +41,7 @@ export function Incubators() {
 									<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 										<div>
 											<h3 className='text-sm font-medium text-muted-foreground'>Contato</h3>
-											<p className='text-base'>{user.contactName}</p>
+											<p className='text-base'>{user.contact_name}</p>
 										</div>
 										<div>
 											<h3 className='text-sm font-medium text-muted-foreground'>Email</h3>

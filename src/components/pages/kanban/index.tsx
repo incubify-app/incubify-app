@@ -1,16 +1,15 @@
+import { useAuth } from '@/context/AuthContext';
 import { KanbanManagement } from './components';
+import { CompanyRole } from '@/types/company';
+import { MyPath } from '../my-path';
 
 export function Kanban() {
+	const {
+		user: { role },
+	} = useAuth();
 	return (
 		<div className='space-y-6'>
-			<div>
-				<h2 className='text-3xl font-bold tracking-tight'>Kanban de Startups</h2>
-				<p className='text-muted-foreground'>
-					Arraste e solte as startups entre os estágios do processo de incubação.
-				</p>
-			</div>
-
-			<KanbanManagement />
+			{role === CompanyRole.MANAGEMENT ? <KanbanManagement /> : <MyPath />}
 		</div>
 	);
 }

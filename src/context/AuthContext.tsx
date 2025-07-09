@@ -32,8 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				.then(response => {
 					const company: User = response.data;
 					setUser(company);
-					window.location.href =
-						company.role === CompanyRole.MANAGEMENT ? '/incubators' : '/my-path';
+					window.location.href = '/incubators';
 				})
 				.catch(() => {
 					Cookies.remove('token');
@@ -72,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				});
 				return {
 					success: true,
-					redirectTo: company.role === CompanyRole.MANAGEMENT ? '/incubators' : '/my-path',
+					redirectTo: '/incubators'
 				};
 			} catch (error) {
 				const errorDetails = error.response?.data?.details;

@@ -62,12 +62,6 @@ export function Incubators() {
 											<h3 className='text-sm font-medium text-muted-foreground'>Endereço</h3>
 											<p className='text-base'>{user.address}</p>
 										</div>
-										<div>
-											<h3 className='text-sm font-medium text-muted-foreground'>
-												Data de Registro
-											</h3>
-											<p className='text-base'>{new Date(user.createdAt).toLocaleDateString()}</p>
-										</div>
 									</div>
 								</TabsContent>
 
@@ -129,8 +123,7 @@ export function Incubators() {
 					) : (
 						data?.map(incubadora => (
 							<Card key={incubadora.id} className='overflow-hidden'>
-								<div className='h-32 bg-muted flex items-center justify-center p-4'>
-								</div>
+								<div className='h-32 bg-muted flex items-center justify-center p-4'></div>
 								<CardHeader className='pb-2'>
 									<div className='flex items-start justify-between'>
 										<CardTitle>{incubadora.name}</CardTitle>
@@ -158,8 +151,10 @@ export function Incubators() {
 											</div>
 										</div>
 										<div className='mt-4 w-full'>
-											<NavLink className='flex justify-center w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors'
-											to={`/kanban/${incubadora.id}`}>
+											<NavLink
+												className='flex justify-center w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors'
+												to={`/kanban/${incubadora.id}`}
+											>
 												Ver detalhes
 											</NavLink>
 										</div>

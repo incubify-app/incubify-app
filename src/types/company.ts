@@ -25,5 +25,5 @@ export interface Company {
 	market: string;
 	needs: string;
 	teamDetails: string;
-	createdAt: string;
+	created_at: string;
 }
